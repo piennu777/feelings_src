@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+  <title>お気持ち募金</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="favicon.ico">
+  <meta name="keywords" content="PIENNU,お気持ち募金,募金,お願い">
+  <meta name="description" content="PIENNUへのお気持ち募金！募金してくれるだけでモチベUP!!!!!!!!!">
+  <script>
+    function incrementCount() {
+      var xhr = new XMLHttpRequest();
+      var audio = new Audio('money.mp3');
+      xhr.open('POST', 'increment.php', true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var count = xhr.responseText;
+          document.getElementById('countDisplay').textContent = '現在の募金数: ' + count + '円';
+        }
+      };
+      xhr.send();
+      audio.volume = 1.0; 
+      audio.play();
+    }
+
+    window.addEventListener('load', function() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'counter.txt', true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          var count = xhr.responseText;
+          document.getElementById('countDisplay').textContent = '現在の募金数: ' + count + '円';
+        }
+      };
+      xhr.send();
+    });
+  </script>
+
+  <style>
+body {
+      overflow: hidden;
+    }
+
+h1 {
+    border-bottom: 3px solid #000;
+    margin-bottom: -1px; /* 負のマージンを適用 */
+}
+
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 500px;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
+    border-radius: 10px 10px 10px 10px;
+}
+
+.btn,
+a.btn,
+button.btn {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 0.2;
+  position: relative;
+  display: inline-block;
+  padding: 1rem 3rem;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  color: #212529;
+  border-radius: 0.5rem;
+margin-top: 7px;
+}
+
+.btn--orange,
+a.btn--orange {
+  color: #fff;
+  background-color: #696969;
+}
+.btn--orange:hover,
+a.btn--orange:hover {
+  color: #fff;
+  background-color: #3a3a3a;
+}
+
+a.btn--radius {
+   border-radius: 100vh;
+}
+
+.fancy-button {
+      background-color: #fff562;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      -webkit-text-stroke: 1px #000000;
+      text-stroke: 1px #000000;
+      font-size: 50px;
+    }
+
+    .fancy-display {
+      background-color: #eee;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      border-radius: 8px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <h1>お気持ち募金</h1>
+      <div style="padding: 1rem 2rem;
+        border: 3px dotted #000;
+        text-align: center;
+        margin-top: 10px;
+      ">
+        <p>あなたのお気持ちを募金していってください。</p>
+        <button class="fancy-button" onclick="incrementCount()">お気持ち募金</button>
+        <div id="countDisplay" class="fancy-display"></div>
+      </div>
+    </div>
+    
+    <script>
+      window.addEventListener('load', function() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'getcount.php', true);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var count = xhr.responseText;
+            var formattedCount = parseInt(count).toLocaleString(); // カンマを追加
+            document.getElementById('countDisplay').textContent = '現在の募金数: ' + formattedCount + '円';
+          }
+        };
+        xhr.send();
+      });
+    
+      // 以下のincrementCount()関数は前回のコードと同じです
+      function incrementCount() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'increment.php', true);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var count = xhr.responseText;
+            var formattedCount = parseInt(count).toLocaleString(); // カンマを追加
+            document.getElementById('countDisplay').textContent = '現在の募金数: ' + formattedCount + '円';
+          }
+        };
+        xhr.send();
+      }
+    </script>
+    
+</div>
+</div>
+</body>
+</html>
