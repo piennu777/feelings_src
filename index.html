@@ -15,6 +15,7 @@
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4 && xhr.status === 200) {
           var count = xhr.responseText;
+          var formattedCount = parseInt(count).toLocaleString(); // カンマを追加
           document.getElementById('countDisplay').textContent = '現在の募金数: ' + count + '円';
         }
       };
@@ -22,26 +23,18 @@
       audio.volume = 1.0; 
       audio.play();
     }
-
-    window.addEventListener('load', function() {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', 'counter.txt', true);
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          var count = xhr.responseText;
-          document.getElementById('countDisplay').textContent = '現在の募金数: ' + count + '円';
-        }
-      };
-      xhr.send();
-    });
   </script>
-
   <style>
 body {
       overflow: hidden;
+      background-image: url(back.jpg);
+	background-position: center bottom;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
     }
 
-h1 {
+h1 {                                         
     border-bottom: 3px solid #000;
     margin-bottom: -1px; /* 負のマージンを適用 */
 }
@@ -65,6 +58,7 @@ h1 {
     background-color: #ffffff;
     box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.35);
     border-radius: 10px 10px 10px 10px;
+    opacity: 0.9;
 }
 
 .btn,
@@ -133,9 +127,40 @@ a.btn--radius {
       border-radius: 8px;
       box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     }
+
+    #loader-bg {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  background: #000;
+  z-index: 1;
+}
+#loader {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin-top: -100px;
+  margin-left: -100px;
+  text-align: center;
+  color: #fff;
+  z-index: 2;
+}
   </style>
 </head>
 <body>
+  <div id="loader-bg">
+    <div id="loader">
+      <p>Now Loading...</p>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <div class="container">
     <div class="content">
       <h1>お気持ち募金</h1>
@@ -144,42 +169,177 @@ a.btn--radius {
         text-align: center;
         margin-top: 10px;
       ">
-        <p>あなたのお気持ちを募金していってください。</p>
-        <button class="fancy-button" onclick="incrementCount()">お気持ち募金</button>
+        <p>あなたのお気持ちを募金していってください。<br><spam style="color: red;">※実際にお金はかかりません。</spam></p>
+        <button class="fancy-button" onclick="incrementCount()">お気持ちを寄付</button>
         <div id="countDisplay" class="fancy-display"></div>
+        <script>
+        window.addEventListener('load', function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'getcount.php', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var count = xhr.responseText;
+                    document.getElementById('countDisplay').textContent = '現在の募金数: ' + count + '円';
+                }
+            };
+            xhr.send();
+        });
+
+                function incrementCount() {
+                    var xhr = new XMLHttpRequest();
+                    var audio = new Audio('money.mp3');
+                    xhr.open('POST', 'increment.php', true);
+                    xhr.onreadystatechange = function() {
+                      if (xhr.readyState === 4 && xhr.status === 200) {
+                        var count = xhr.responseText;
+                        var formattedCount = parseInt(count).toLocaleString(); // カンマを追加
+                        document.getElementById('countDisplay').textContent = '現在の募金数: ' + formattedCount + '円';
+                      }
+                    };
+                    xhr.send();
+                    audio.volume = 1.0; 
+                    audio.play();
+                  }
+              </script>
+              <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+$(function() {
+  var h = $(window).height();
+  
+  $('#wrap').css('display','none');
+  $('#loader-bg ,#loader').height(h).css('display','block');
+});
+  
+$(window).load(function () { //全ての読み込みが完了したら実行
+  $('#loader-bg').delay(900).fadeOut(800);
+  $('#loader').delay(600).fadeOut(300);
+  $('#wrap').css('display', 'block');
+});
+  
+//10秒たったら強制的にロード画面を非表示
+$(function(){
+  setTimeout('stopload()',10000);
+});
+  
+function stopload(){
+  $('#wrap').css('display','block');
+  $('#loader-bg').delay(900).fadeOut(800);
+  $('#loader').delay(600).fadeOut(300);
+}
+</script>
       </div>
+      <!--  <p><img style="transform: translateY(16%);" src="warning.webp"> 現在テスト中 <a href="test-details/">(詳細)</a></p> -->
     </div>
-    
-    <script>
-      window.addEventListener('load', function() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'getcount.php', true);
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            var count = xhr.responseText;
-            var formattedCount = parseInt(count).toLocaleString(); // カンマを追加
-            document.getElementById('countDisplay').textContent = '現在の募金数: ' + formattedCount + '円';
-          }
-        };
-        xhr.send();
-      });
-    
-      // 以下のincrementCount()関数は前回のコードと同じです
-      function incrementCount() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'increment.php', true);
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            var count = xhr.responseText;
-            var formattedCount = parseInt(count).toLocaleString(); // カンマを追加
-            document.getElementById('countDisplay').textContent = '現在の募金数: ' + formattedCount + '円';
-          }
-        };
-        xhr.send();
-      }
-    </script>
-    
 </div>
 </div>
 </body>
 </html>
+
+<!--
+`````````````````````````````````````````````````````````````````````````````` `````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+```````````````````````````````````````````````````````````````````````` ` `` ````````  ` ````` ```````````````````````````````` `` `` `````````````````````````````````````````````````````````````````
+`` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` `` `` `````  ....__--.-...-------------.... `````````` `` `` `` `` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ` ``
+````````````````````````````````````````````````````````` ````````````` ``   ..-(-_~<<<<<<~_.-_.._~_~~:~~~~~~~~:~:<<<__-...``````` ``````````````````````````````````````````````````````````````````` `
+` `` `` `` `` `` `` `` `` `` `` `` `` `` `` `` `` ` ` ````````` ````` ._(((<<<<~___.__---(((J(JJ&&e&&uu&&&&&&+++--+____~~~~~<<_-... `   ```` ` ` ` ` `` `` `` `` `` `` `` `` `` `` `` `` `` `` `` `` ```
+``` ```` ``` ```` ``` ```` ``` ```` ``` ```` ``` ``` `` ` `` ``  .-_(_<<~_.~__-(++&swXWWWWUUUUXXV7OwZZVOVVUUZUZXUUUUXXXA&+++-___-_~~_--  `` ````` ``` ``` ```` ``` ```` ``` ```` ``` ```` ``` ```` `````
+````` ```````` ```````` ```````` ```````` ```````` ``` ```  ..-((<<<~~_-((+udXWWUUVC1C<<1+(+__jWc_+e<(&+__++-(w>~_~~?wVwX0XXZww&&+--.` `.._.  ````` ``````` ```````` ```````` ```````` ```````` ````` ``
+` ```` `` ` ``` `` ` ```` `` `` `` `` ``````` `  `` ``` .__(<<<~~_((+gQWWH9UC<<<(uAm++<?TC<<<(x_<~jk<(dI~-(_-.?:(vU>.I~(wuuV1ZVTXXykA&-.. `__<~..``` ``  ````` ` ```` `` ` ``` `` ` ```` `` `` `` `` ```
+`` ````````` ```````` ````` ```````` `` `` ` ``````` .__:::<__(JgkWHB96<?w-(XUUw_wXXYCz:duVC>(Xk+-jS<(dI_zZXC.._+---.> (uuZ<._(--_?zOwUWGu+-.. `___.  ````````` `` ```` ``` ```````` ````` ``````````` `
+``` ` `` ````` `` ```` ` ```` `` ``````` ``` ` ` ._::~__._((+WqHHHo-(dWk<?I-+J+z<?VY<(1+(++(A+dXWXwykuXWAwXWO(--dX0< __1XZ>_(kzVC((-_-??zZ0XAz<-.`` ~~- `` ```````` ````````` `` ```` ` ```` `` `` `````
+``````` `` ````` `` ````` ```` `` ` `` `````  ._((<~.._(JdHHpkkHH9Y>_wHWw:zx?Y7>j++dXXVY77<<<<<<~(XXR<<~__~<<<<?XuZXXk+(.(_(7<(JzOC_.7UG,._?1ZUwrz(-.` __.   `` ````` `` ` ```` `` ````` ```` ``` `` ``
+` `` `````` ` ``````` ```` `` `````` ``` ``.-<<<~.`.(jXWY76x(dkHI(+.<(XY>(jkkZ777<_(OTC<;:;(;<(<_-(J+-<~:::_~~_-?76~-  ???COw&-(_ `(0&._~-ZO+_?lOwwz<+-`  __.  `` ` ``` ```` ``````` ```` ``````````` ``
+````` `` ````` `` ```` ``````` `` `` ``  .(:<_`...JXWC<(jo(CI<XHXUWQmAgdX<<<((_(::<.(dkz+-(+++&++(wZku&&++++(<-(wa-_:~~___-. (zZUw&+_~?!_jOOv_(zzl=zOzOz+-.` __  `  ````` ```` `` ``` ```` ` ` ` `` ````
+`` ``````` ``````` ```` ` `` ``` ````` (+<<_` .JwXY<(+<vV>(,jI~<<+(Y<<XU>(?><<<+++z(jyVfWUUUUVTTOvzvCOTTTTTUUUOwXZAA++-(_:__`.?OV>~??Ijx-_?z_(Z<!~1zv<1zOwz+.` __.``` `` `` `````` ```` `````````` ``` `
+``` `` ```` `` ```` ``````` ````` ` .(<<~` .(uXY>-,zHWI<+dHXoJ6<<:_(<~_dkkXAwAXXUUVI?1++zuswAwwwuzzuuXzwwwwAu&+--(:<?TTUUXwo(jw2_____._<?I&+(zOAc-jI_(-_<zOwz+-.` _-  `````` `` ```` ``` `` ``` ````````
+``````` ````` `` ``` ` ``````  `` .(<<_` -(d0C<+dWS+jWuk(UWf<_(>>>?++1<jHMW961&&uwXUVTTCz1z+++J++++&++++++---(<??7TTwXy--_?+1Own++__~<~__.~111zIOv!--_?6:_?1OOz1<.` __  ````` `` ``````````` ``` `` `` `
+` `` ``` ` `````` ````` ` `` ``` _;<~.`.Jdf>(.++?XXXc?XVTHV=1z<zzzzwyVYC1+ggH9Y61+J+sXVUTT77C=z>++((+(++<<??777TTZuJ--_??7TX+--??TWk&-(____1zZ<1O&+zZX&, _(-<1tOOz+.` ~-   `````` ` `` `` ```` ````` ```
+``` ``````` `` ```` `````` ``` _(<_`.-JX0!(+KYC<i(Ty0C<++~(jQXXXXVY1j&QWYY1j+dXVYT1&+&&wXW0XUVTTT77XkVVOVUUUUXA&+J--<?7TO&+-_?1vO+-<?TXAxdw+_~-._<11lzv!(-_?O-<1wXOv<.` `-.` ` ````` `` `` `````` ``````
+````` ` ``````` ````  `````` .(<~_ -JwVC+-?WyisI(1+!(+wtO+.UHUYC(+dVYCijsXYTIugAXXUT711<?I_(x-?<<<-jk_(O&&&++--~<??7TUG&--~?7Ou+-<?TGJ-<?1OI-<~::_-_?1&,(zX+_(&,<1ZXw+-.` _-``` `  ````````` `` ``` `` `
+` `````` `` ```` ```````  `.(<~_ .+dV><+-?I(7>-+<<(zrOttOwkv>(dXT<+&wV71ugXH9YC<j&ew0UU>_l~(&x=??<_jS~(c<<;<<??7TVww&--~<?TO&+(<?OO+_<?O&+~?Ukx<~(:__-?Xk+~~+-?7w<?+wXy<-.` . ``````` `` `` ```` ```` ``
+`` ` ````` `` ``` ```` `  -_~``.+d0C(dXy<1(1udWS?OtrtOwX6<jdUC<jw0<ijdW9Y<++dXUUC?1jx:(:_l_(+~(_(_.zR_(>_?777TVww&--(<?7Ow&-_<1Owx-<?Oo-_?OO-(?UA&(~__.zOZw-<CXc(!(+~zXXz+_  __ ``` ``` ````` ```` `````
+````` `` ````` ``` ```  ._<_` (wwI_jWXuu0<(I<?7<JkXkwVC(dV6<+wT<+dX9Ci+dXUY1++dXV0CjD_(:(=_(>(+&++.jD_(>_~(XXw&---_?7TXO+-_?7wG&-?1Ow-(?Cw+_?Oo-?OXk+w.(z><zO-~+(A-?C~(XtO++-  _.```` ``` ```` ````` ```
+``````` ``` ``` ```  ` _<!``.jwXXXIi?CV>(+C-(z-?WW0C<(dY<(Z=<JgW9>(&dY=<(&ZYY1++v<<.C_(_(z_?74odk+O76-(>___1?77?77TUX&--_?7O&--?7Xo--?Cw+-?CA.(CX&~?OtZ>_<_-?OXwXrX>_zrv?wwz<-- __ ` ` ` `` ```` ```` ``
+` ` ```````````````` .(<~` -uXZX0--_zo-x>-(rrzz+z=(JV=<+V=(iWY>(+VY>(&ZY=+JeQKTY~ZTHHHHHkQk0<.JJJJ-+TWQkHkkkky>_<+J-(<?7TUy--?7O&._?Ck+-?zw-_?0+_?w&_?ws+:~__-?OOv++zuzAx?zzw+_-`-~-  `````` `` ` ` ````
+```` ` `` `` `````  _+<_` (yXo-?CwXmwUC~(OzzzzwC+J0=(uv<Jd9=(JZY>(xV7<(gkUY1++&Z<<_dHHHHH@R(:.?77C<<.(wwOVOwSI<_(J-_?7C+-_<?7U&-_?TO-_?zG+_?4&-?OG-?Ts(?Wo-:_~_-1wZrvtOI<(-?wWo______ ```````````````` `
+```````` `` ```    _+~...jKUuuVXx_1wXO&zzOz1yC<jV>(vC<jXY<(yV>(dV7+JdWY<++wV71+a<z.dWkHHbHS<>(TUTTC>.(rtlttw0O>_-~?7Tw&+-?11+_<?Ow&-?CG+_?wo-?CO-?OO-?4o(?Xo__~_(jwwI<<(zuX>?wUy<_-_(- ``` `` `` `` `` `
+` ` ```````` ` `` (<<_`(dM3+v<1uAAAZUC<dXkdZ<jV>(OC(+?7<JZC<_~?<jd9=<(dZ<++wUV1+_<-dWqkpbgS;>(wXXkz>.(tltttO0O>_?7Ow&+-<?Tw&-<1O+_?CXx_?Oo-<zG+(?X<?zw-?Oo<zXAjx(zv1wwwwZz<(+_zUw+__._<_``` ``````` ````
+```` ` ` ` ````` (<~``(dUI(?Oo-?T0<___vWXV!(ZC(zC(+!(+_?<:<_(1-zC<~_(<_jV7<~<_?C<<_zkqkppgS:<(u&&&+<.(tltltwXI<_vw&--~?OX&-(?TA&-?1+_?4w+(?w+(jC+j><-?zn-?X+<OwZC~<<~zO><jwzzZ_jXXc___(<_  ````` ``` ```
+````````` `` `` (<_` (zV<-(7i-?O>_(zz1-jC(dD<+v<+>_(+<<(<-(+?<<(~((++?~(<<-(+<_?><.dkkbppg0:<.+-++(<.(tllllzuZ>~(__~?7Uu-_?7X&-<7Xo-?I.(?Xo_?0x(Oo<__<-?Xo/Ok-1nJ<~_~_?0+?OZC<-.zuuo_~_<>_``````` ``` ``
+` ` ``````` `` (<~_.(dV_JHZG+/7>_+ll<jX>Jk>(v:(dC1xv<(dCiwO<<(Z>zAv<+JZ>(z++<<(++<(dkkbWWH0<<(TTTT7>_(Olll=z0t>__((-_((.?7Uu.?70&-?TkJ?C&_?Us-?Xx?z+<_(n(jX+?Ux(Ukx:~_.?0+-(+zXuXzXXo__(;<- `  ```` ```
+```` ``` ```  (<~_..jw<?TzXV>(<(ztv1dZ~jY(JC(uV>(z=<+C<+XC<JZ>(dC<(ZY<(dv=<jdXMK><(dkkkWWHI<~?UUUUI>~(tllllzwZ>~~+>><.OUWA-_?TA-??X+_?So/?u(?Us(?w+?Os-?Xx?0s(OnJwkc_~_-(wXuzvvZZ7<jWo_~<?<_ ````` `````
+``` ``  ```` (<~~_(jC<<C&-<<(wwzOz1dC(dC(y:(dY<jZ<(Z:(dY-JZ!(wC<+Z=(jZ>_jdWHHMMD<<.dqqHVVgI<~(ag&a+<~(tllllzrZz_+7wv<JOzOZXWk+(?O&-?Uo-?0G-?x(z6<J<~~?Uo(OG<zS-jk/vWo(:_-(wwZI<~.(&_vWo__<?<_  `````` ``
+` ``````````(+!.-(df~jXXO+<jXS>+XWkC(X>(6(jKC(dv(v>(df<Jv!.(;_.(<-((+-((+++++&+&&<.XmqHfWHOz-(<<<<<<~(tll=ltOOw&(J++..~~~<?zOZUA+??w+?On-?UA(1o(dSz<~<(Xkx?X+?So(Xo?XSz+(XVwwwwXl(dl_OSc__<><_  `` ``` `
+```` ``````(z<`_(dS>(7TuV>(<~~_4W0<(Z>jI(d8>(Z:JZ<(K>(y>(z<IOWkHHH@HHH@H@HMHMMH@HkQWgqHWWHWkWHqkkWWRzztllltlOXWHHHHHHHHkmA+-._??XWo_?0x(OG+?Uo(I+vXAO-(-?Xo<0o(UI(do?w00>_~~OXuzXo-__(dR< (;>< ```` ````
+`` ``` ```.+<_`(dk>(dA&-_(>(zz+_Z<(f~jv(d9_JC<jv(dD_Jv~jC~(<(MMHHHHHHHHHHHHH#HHHHH@@HHpVyZXXwZZOOOOOOtllllttrtlttttttOwXUUWHWk&-_<vUs-?So?Xo(OSx?z<XW-(Wc?Un(Tw(Zn_do(I+<~___zZC<__~u-?Xk<_<+z_-`` `` ``
+``````` `.(1~`.jXC_?TXuZ0C(zzz+w>(f<J>(X$(J3(d>(yC.zC(v:(O<<(H#HHHH#H#H##HHHHHHH@@@@HbpfVyXwttttttllllltttttttrrtrtrrvvrrwzzwUWWky-(zWs(vX+?S+?Vi-__?Wo(4o?Xk(Cw(On_Ox(WI_~~.-Oo_zG_vk_vUI__<?z< ````` `
+`` ` ``` (1<  (wI(dWG+-<>(+zl<w>(R<Jl(XC-J3(Z>(V>(Z<Jv~jY~(<(W##H#HH#H#HH#HHHHH@HH@@HHppyZuzwtttttltltltttttrrttrtttrrrrvzzzuuzXUWWG-(4k&<Ts(4s(wkz_-?Uy(Zo~wk(jn/Oo~O2(Uc_.~ (Sx(XI~<~1Xw<_<??<_`` ```
+````` ``.+<_`_+kz?4uuZ0S~+zz<dv(k<(3(d$_x=(v>(V:+C(JC(dC(z?:(HMMMMMMMMMMMMMHHHM@@@@@gHbpfWkkwwwwwrwwwwOttOtrrtrrwOvttvvrzzuuuuuuzZWWks_jWk+?k-jSJXky-~(Zn/Oo_OR-jn_Zo(0x(X;___ (0<-(-+Z.jZw<(1=1> `` ```
+` ````` (<!` (d0OOwx+<?XkzOwAv<w<(I(d$<jI(Z:(V:+C(v>(d>(w<jA+&&ga&&&&&x++-jMHH@@H@@@mHbWWHC(me&&+zz>><<><~~<<?COruuzrvvzzzzuuuuuuZuXWpk-jWWo?Wc?X>dUI(I(dn_Zw(Zk_dl_Xc(S<jXx-~(JXI_dI_wc(Xwz_(1=<_``` ``
+``  ` ` +>``(uV<jk+u:?U0C(dW0>dI(0<JS:jC(z>(Z:jv(Z!(V>JZ<JC<d3<XC1dMHMM6z~(HHH@H@@@@gHHHHMzv?<OO<<<?1z1zvU0w&+-_?OXuuzuuuuuuuZZuuZZuXWpn-jXWk(=<(<_?Wo(I(Zn_ws.wI_d>(S-($_zWk_?UXWo(O>_~_(Xw<_<1l< `````
+`````` -<:`.jZ>(w>(Z>(_+-.?O>(v~z<(K>(Z<z>(Z>(v<w>(Z>(Z<j>(J3(d>(k>_+z<+z_(WHH@@H@@@mmqHHMIc(1<?>(:_(>(---+-?OWk&-?OZuzzuuuuZZuuZuuZZXyWI_zUHR(XZ<~_?Sc(l(Xo_Xc(Xl?X-1k-jl(OC>.__jI++u+.k-jWI__<=z_ ````
+`````` +>``(zuy++-(C(<+=1<(<<d>(C(d$_d>(C(z3(v~d>(y>(c<z<(y>(v:+9>---_.(+_(HHH@@@@@@gmqqHMII(1(_(>+>.<+?=_(Wk-jUkwo_jXuuuuuuuuZZuuZZZZySX:(wwXSzI?_~_(Sc(>?X<?S<(X-zO_O2(O-zz_.._(OuXXS_~-(dX<(<=?<  ```
+``````(?>``(wuZX0XWXV<+=z>(>(v<z<(D<(>(O_(D(z>+v(s>(v>j<+y<(I<dU<jk(+1<(>~(HHHH@@@@@ggmmMNzI(z+_(==> +zv+_(1(.._?WWy.zyyZZZZZZZZZuuZZZykw>~+(+_<OwZ_z-jk<j_vk_jI_wn_w>(=_(o_w<._. jXC<-((ZZXXz:<??<_````
+`  `  +>``.juZXXXuXX><zlv(c~d{+<(k3(v>j<(R~jl(v<j3(v>(v(w<(I(d0<jm0=?7<1<~(HHHHH@@@@@ggmMN=I.<?7+77=_?TYwzy+Z1z<(dZ0<(yyyZZZZZZZZuuZZZy0O><jwy>(>?X:1y.wI?+_XI.Ul(X>?Wk&&+w<zI~~.-_wyZZyZZyZuk:>;?1_````
+````` +>``(wuuZuXwXX>+z?>(C(v~z<jD<jI(z<zC(x~d>(0~(C(v<jv(I(dHHk&?C(+<~(><(HHHHH@@@@@@ggMM=I.<1z<11<<?<<(<<(kzj;(dVO>.yZZZZZZZZZXuuZyyyIj{(O<<~-(>?w_Ic(W{(<?k<jn-zA-?XXuXWl(w<~__`jZZUXuuZZy0<~(+=_ ` `
+`````_+<` (dXuzuuXXWyV<wXy<Jl(z(X$(+>j>(0~(C(v~dv(Z_j>(Z<zAx?MHHWk(zwwo+O<(@HHH@@@@@@gqg@N=I.=uQQm+_((-~<+<(UYjGd0<O<(WXWyyZZZZZuuuXyX0z(!jv?<(<_j<O+($_zI_+_wo.Ol(XWo(?XZWk_Oz(___JZZuuZXXZZXz_<<z+.```
+` `` (<_ -<dV0VuuwX0U>(XWC(z>z>+0>(I~j<zI(I~j>(Z<+>(c~dc(WHXn-7MMHkA-(-_1<(HHHHH@HH@@gg@HN?I.(_<<~++JQm&dQk-<-JWV<dI+WWfXyyyZZZuuuXyy0C(>(d+z<(+_(+_w_1l(X:?_(R_(Wo-?XWx_?Xkx-:___(dyyuZZZuXZXI_::1z_ ``
+``` `+z  _(w>++:++<<(+(~<c(I<z<z0~(C(<:w>(C(+!d>(I_(l(dky(TMHkA<7HMHHMM$1_(MHH@HH@H@@gg@@N?I __.~-?T9T9TTYT<(ZY>JZOwVyyyyyyyZZuuXXfy03(I+dC<<____jX_1>.I_dI~<(Sx(zWkx(OWko_??7<?7+777777TTTUWXz:;+zl~```
+  `` <v  (dZ>+w<jf<~+=?;<>(I(z:dI(z>j>(z<+>(I_d>(I(dWo?WkWo(TMHmmmgggga++~(HHMH@H@@@@@@gMH?I.<<j++_(J+++&zZY1(JXXwXfVyyyVyVZyWXZZWyV<(SwXWoz+<++_.d>(0.1;jZ_+_jWk-?wWk.?TUUuuzwwwwwwwwwwyz&--?1:<(1O_```
+```` (<  (dX+(+(x>(<+==:?<jCjv:XI(I<j>+I(I<(I(z<zXo(4Xk+?Hkk&J-JJJJJJ-J-<<(HHH@HH@@@@@@g@H1y.!_<?~~??<<<((JzUXdWfWfffffVyVVyZuXyXVC(yCdWVfC<<~___jWI-I_(>(w<<&,?XWn-?UWs-(-(((((((-((((--(-?7wo:<(1r_` `
+```` <<`.(jZWXWWUI<<1=z:z<1>j>(X>(0<j>zv(0_+>+wA(TXkx?WkAJJJJ--(J-((JJJ-+<(H@HHH@H@@@@gqgHHQHHHHgHkHkkkWWXmXpHHWWVVffpfVyyyZWy0C>jw6ukWWWXzz<::<!(d0_<>(>_do_7W+(7Wkx~??77777777777777<7777U&-(;<(1t_```
+```  <<`-<dyUXuXUC(++=z(z(z>jI<u>(S;+<d>(0(dA<?Xko(OVn<?77=<J+--(--~?77!<<(HHM@@H@@@@g@HgHqHHHHHHHHHHHHfffpfWbppWfppfVVVfyyWWWsdWk+_?7UXWWC<<!~~~jX0_(>(I-zWk+(Vk+?OUSz+z&xz&+zc_._     (z&+_?1<~(zw_` `
+```` <<. _jXo+&++++wZzXkk(z>J>+u>(S;+<dI(k+jUXA<OUXo?TUWWU0+z+z+??z<-?W6<<(HHH@H@@@@@@@gmmHbbppffpppfpfffffVfppppppffffffWyyyVfppkkkA+-??C<+(__(_(dk<(>(dk+?XWs_?UG&(((((((((((-(<__..--.(-~?zz<_<=O!``
+` `` <<  .j0v<<;+<jXC<dU0(z>J><Z>(R;+<dI(WXn<dWVs<TVVwrXwzz?C7+OTT76<?<+<<(HH@H@H@@@g@HgqqbbpbbpffffpfpppppfppppffppfpfffVVyyyyyfffpHHWk&-<OOv11&jWk<(s-?WWA-?Wk&-______:~~:~~_~____~.._-<?TX&+::<=O_```
+```  (< `_jW>zX<zWS>--((I<jljI<X>(S<+:dWo(4XXo<TWk&aa&&+&+.(z++++1+>_jgx+<(H@MMH@@@@@gHHHHH9UUUUUUUUUUUUUWWWWWWWpppppfpffVyyyyyVffVVVVWbWWo_?k+_?WV0<(HWo_OWWo(?TTTTTTTTTTTTTTT3~__``__(7Ow&-_<<~(?O!```
+```` (z ` jX><7<?TTz?=z<(zjIjI;XI(S<j>vuUWo?4XW+((><?<??777jIzzlzzzo-(--<<(HHHH@H@@@@gm@gMI(i-(--(--..-----_._<?7TUWpfpWpVXXyyyVWXVyyffffWWk-(Wk&/?Wk.?UWW&_OUSo++++-(JJJJ(JJJJJ--.._ .`-(--?7I~<<1z_```
+`````(v_`.(X>?XkwkXc+=?<(I(I+O<XI(O>jl+XzzXWo?777T77TTTTTTY><!_?<~_?7777<<(HHHHHH@@@@@@gmMOI~?77<77?77777777TYOw&-._?UWWWWWZyZyyVyyyyVfffWHWR-(WWm+?VHs(zUWk---(--(--------((---_~--__~-.-_?Tzz_~<?z~` `
+` `` (z-` (XI~?7<<<<1=lz(I(0<d<d0<jI(1~XXuzXUUYTOUVUUXXkQmy<=l===z><_?B6<<(HHHHHHHH@@@gH@N=I.+zV9UVTTTUVVXXwwA&J-?7O+-?zWpWyyXyyyyyVVVVVVpWppS_jWfkk+(4k+(<<(~_ ` .` ._   ???77<-.` ```.?7TX&-<:<+z>````
+ ````_?<``(d0<dWpHWSz+?z(I(z:d>+k>(S<j<dXuXZ>+dQmsys&&&&&&++z<1111<<jQmo<<(MM@HH@H@@@HM@@NlI.JJ-_.-_.----.(--.<?<<~.~?A-?wWffVWXyyyVVVyVWfWfWXc(dWWWWA-?7Cz<<<~+x-(&-_(- _`(zrzzz______-+w&-~?1:<1z> ```
+````  1>`` jVI1Xv4I?wwzXkR>jljO(WI(O>zo?VC<jdWHY<(a&&z++++-(+++++++_-j&+<<(MHHH@HHHHHM@@HN=I.dMI+<+<_(+++_.(+<(_(>?><.dk>_dppWyWWyyyyVVVVVppHw$ jC<!<<<~__(z+_~jSz__<+_~_ .(++++((-(((((--(<?1:>+lO:````
+` ``` <z-``(XI_XI(0<dWc?UUI(I<w<Ok<jI<O_X+(HHY>(dM9=(J-((-((zOzzOzz+-((_:<(HHHHHH@HH@H@@HN=$.dHI++?<_(??=<_11=?~(><;< JHX_(XppWWyyyVVVVyVyfpKOI.(o+_~__<__-._-_-_?1--_1-   -------(_____~??TI+<;1zv_````
+``` ``_l:` _dk<~i((Ju<-.<(1<z>vI(HI(X<vz?k<zI(qH9>(dHMY><<<<<__<<~.?<<?<<_(HHHHHHH@HH@H@HN?I ?7=7C1C<?OOC1+wAzu&J+++&.dWC<.XpfffVyyVVVVffVbkHzI.JHkkkkyZ7>_~__<+z_-?<_._~.`_<<<<<<<<<<<?7TI+-<;?=z> ` ``
+`````` +>` .jW077<((Jz=11>(ljw<w<zR:JI<O(O2(U:dC(uHM8>(qMH9<+????=z_-?Y6>_(MHMMHHHHHHH@HHN?I.ZwWWWWXWkkkAdWHK~(kHH>(HWHf1~(XkpfyVVVyVVVfWVWbH1>-dqppHY!.jV=<<<(jI(<_-<-_.  ?7777TTTTT7TXA&J.+_(+lz!`` ``
+`` ``  (z_` (dk<7UY771z1z>_j:dzzI,HI?Xc?O(ScJk<w<?BC_jWM9>.AAyOwAz1yuggx<<(MHM@@H@HH@HHHHN?I.&J++JJ-.-....-(0~(HbH>.bWf!(-dWWyVfVVVVVVVVWWWpS(>.dHWY!(jV^.+X&+_~?z&+--_++._(+++JJJJJJJJ--??7<~(1t> `````
+``` ``` 1< ` jXI(gQWH9Iz?1>(1?w(UcjH>dS<Oc(k<ds<X-iJl_dC(uHMM6<(J+-((:<_(~(HHHHH@H@HHH@HHN?I.+(<~<<(jmA&ae&(>_(9T!(+U=-J1dkHVyyVVfffVVVVfpfH>(~(WY!-+Z!.JZ>__~<<<<?1<<:(>-..-........-__?7I<~~(tI:``````
+ `````` _+<``(Xk<:<+Jgsz>lz+j>vo(R(wR<dk(0xzk<Xo?0(1z<_(?MMY<(dHMH#<____<_(MHH@HHHH@H@@HHH?I <~_~_?UUUB9Y9=_.-_(+yC!.(1uXHWyfpffffffVVVffpW6~>.d%_JZ>-JZC_(v<~<_~<~<~~~<~_~~~~~~~~~~~~~<11<_(+1tI````` `
+`` ` ``  <<.`-dHWWqkHHHkkk?UHk<X+jk?Xk<UI(S+dI<Wo(R(1w+(+?S+?MMMMM9(?+<_<<(HH@H@H@HHHH@@HH?c.<~++<-JJJJ&&aewXVYC!-(zzwWHVyyVfVVfWffffVVWbb0~<-JC-?!-JX=_(z!-J6!____~_~_!_~~~~~~<!<<<<<?4Ax_-(1zZ>`  ````
+````` ```.z:  _wWKY=<ZHHWKC(<?1<XJjs?Wk<Ws(S<ds?W>_<<OA_Wm,4e_(+((-.---.-_-HM@HH@H@H@HMMMHz> ~_?<! ????7<<!~-.(xwwXWWbWyyVfVVVVfWffVfWWWHY!((Z!(<~(dC_.z:_(v!-jQkkkXkkWkkAswwkXkVzAAwkk&-__(+zZ>````` ``
+`` ```` ` (z_` ?Umgqs_((Jo(++__z(R(Ol?Hy(Ws?X/dA:zw>(~?X-Ok+?%jvWHMHHHHHHQdMMMHHHHH@HHH@HMmQQWkmQQQQQAAQAmkXXkkWkHbpWWyXWfffffffpWVppkHXC~++I~,<_+V!.z!-(v!-+XHHHpW0!?VU3_?7UWH$__?TYTW0C~(+zOv_`` ``` `
+` ```````` <+_`_(WkHWc?H9Y1z?=_<z(b(Xo?Hy(Ws?W:Zk(CO<_-?Wx(Sc(?<MMHHH@@M@H@M@H@H@HH@HH@HMHHHMMMHHMMMMMMMMgqHkkkbpppppfppfpppfffVfWWpqHY!(<&<_(~(dC~(<_(v!-+XkHWpWWU:-<_-_~_. (WWdknJ-.dk>_;+Ov!`` `` ```
+``` ` `` ` (1<.  (Wk(+<(JgQI??z-<c(h<do?Hn(Wn<dx?kJjOu<u(Tm(!j:jMHHHHHHHHHH@HH@HHHH@HMMHHHHM@MH@@H@HM@HgHHHbbkbbWWkWppppWyyVppppWkH9=~.+1v!(<_(X=-<_(v!.JdWHWWWWWV!(<___..__.v?7UWqY<zS>_(zOO< ````````
+`` ```` ``` (1-  _jH$<j+?HH9I=?1-(2?n/4n?Hm(Uk<Zo~!_?Xo<wx?U>(<dM@@@HHH@@HH@H@MHH@HH@@HHHH@HH@@@@gHkHgqkkkkbbbppppfpffWVWbbbpfWW07~-(1Ov!-(~(df~(~_(I_(dHHWWpWppf!(<_:__...(dHke-_?~(wI~(1zrv``` `` `` `
+````````` `` (1-` _zWs~C<~<(1OsOjWNo?G+Xk(Uk:dHx<zI<_~vW+?S,(>+MMHMMMMM@H@HH@H@HH@@HHHMHH@MM@HMMMMHHHH@HbkbppppppbbpWWkbWUUY=<~-(+zwX0>_+:-+V!-_~(v!_jpHqppppWK$~(>_+-__._(do-?7W$~(d0<(+ztv``` ```` ```
+`` ` ````   ` ?I-` (dHn+X9<(uXmH+?=?1?X+?RJZHo?WA(4z<_(<Un,<jl.-_:<<?77TTYYYWWHMHHMMMMHM@HMBTTTTTTTTWHMggmWWH9TYT777<<~_--.(+wwwXkW9!-(!-JXC_(!-+<_(Z!_?7ZHpbH3-(>-dXC+--(XHqK>_._(dU>(+ztv~````````````
+````` `` ````` +I-  _vH0_(s<dHH9<-(1_j<4o(Sx?Wm_Tm+?Gy<d+?4e(<:<z7TTTYTwrO+&&J+J+-.dMH@HH@N+v1&++J--.Xgg@gg@K(+u&+zzwXXwXXkkWHkWVY~(<~(JZ=~(!_(v!(z>_:__ (!(U!.+!_<?~(dHHC_?7!(v~(d0>(+tOv! `````` `` ``
+` ```````` ` `` 1O<  _?Hn,T3_~(+kz+=1_?(?k(On<VH+~_<_?G-7G.(4o-?WNHWUUXwwO&.__!_<O_dMHH@HHN1>.-(--(<.X@@@ggMKz:(~.-.79UTTTUUTVY!-(<_.&Z=-(<_-v!-jv~(<__:<_(Z~(v~_~__. ?0>((-__-.(X0:(+lrZ!````````` ````
+`` `` `` `` ```` <z<  _jHkJ&QWM974xzlz__+(Ux?Wo?O&I-___7A(7k+?TG.?4s.-(JJJJ.(zz<(I-dMHHH@HN1l.<<<<~>.X@@@@@MH1>(=<<-(--....-._-?!-_?7^.(<__?!.+C! ~?<O<~(w>-+<-<_____(x!.dHHk_.zHf<(+llI!` ` `` ````` ``
+```` `` ````````` ?l<. -?WR_?7<JgKY1l11z(k+?n<?G-?XZz+_((?n-?O&_?X+(?1+_?TM#v1v11I_dHH@HH@N1>_?7<7<<.X@@@@@MK?<(>?<_-(-((<<>< -_~_-- ~!___(-.7!.._-._!.jv~(<__~.~___(XHm._?T!(dWC~(+tlv`````````` `` ```
+`````````` `` ```` (z&. `(UHx_dMY4m-1Ow<vMHI~Oo<OA-jXw>OHe-?O+?CA-(C0+_<1z-__--.(v-d#H@HHHN=>(zOOO<<.W@@@@@MK=:.+=<<<_(OI!_(+I_((<<<_-_-(;<~._ (<:<_.+C<(+!-&-__~_(dA-?=!.__(X0C~(+zOv``` ```````` ````
+` ` `` ```````` ``` _jz-` _dHs~Um+?Y<?HHI`(-(<<Ox(Cn-?U&(7Hm+_?z-?Co-_?O&-_<<zz<(v-dMHH@HHN=>(OOlz:<.W@H@@@MKz<.-(<<~_((uZYC~(z3~-(z<(jZ<<-(v1O+<~-+V!-<!_(XY<1&-+XHmS>(JWkaWS<_(=lz<`````` ` ` ```` ```
+````` `` `` ```` ````_11-  ~?Hk-?5<(<-(W&+zz1-?<?Tx(7n.?4A-?THe-?C&.?7O--?T6&+-<<1-dHMHHH@N?>((JJ-(<.W@HH@HMR+<.((J+ZT=<_((<<~-(z!_.+v=_(JC!-JC<(jZ<(+>-_~_` jWHf!_?Uk..THHWC~(+z1z! ` ````````` `` ````
+`` `````` `` ````````` <+I.  _THsJ<(dc+M96yzOzi-~_(To/7G+(TX+_7Wmx-?11-_?To--_7T<z.dMMHMHM#<>.-(--(<.H@@H@HMk<_?7<~---<?<_.(v7!-(+v>~(Jv!_(+>_(JC~(+>__~-~~~_.Z=-(dn.?Tk&XY!_+zlO<~```` `` `` ``` ``` ``
+```` ````````````` ``   _1O+. _?HHdMD>?<((?1tttlz(mx/ju-?4e-?Tu._7Wme._?1+--?71+-z._!_~!<<!.: ~<!<<<-777777"7<_-<?<~_.(+?<~-(+v7!_(+Z7~(+?!(Jv=-(?!-~_.:_:_(+<<(-?WHY~(j8C~<+OzC! ``````` ```` ``````` `
+``` `` ` `` ` ` ``` ````` ?zz-``(TMMf+(v<(m&_jwwx?T@<__?O-(74&-?C&._?THm&._?7i--_??74ROXCwC<1J>?C?wkxjex&&&+J&<(-+?<<~.(Jzv7<_(Jz7<_(+<!-Jy=~.+<~(u&-<<__(+<_- (Kz-.(jkC~(ztlOC!```` ` ```` ```` `` ````
+` ```````` ````` ``` ` ````.<O+-`_(THk>(dHMKC(?WNR-.++-__?1G+_?X&-<?Ox-?7THma+-_<<<zdD_j<z<(o(----(H>(k!jI_?<<~_((+zZC<<~-(uO7<~-(z<~.+ZC!-Jv!___?7<(Ax+uy<.z0~($__dkY!_(zOOZ!` ``` ``` ```` ````` `` ``
+```` `` `````` ````````````` ?1O+-  ?TWo_?3(+>(dH8&Ozzro-__~_?O+(?Tw+-<?O&-_?7THHmaJ-((J~z<<(+z<1<.k>(S:(WUUO7<<<<-((+zOC<<-(+<<~-JzV<_(+<~~~__.(_`(XHHWHgHk+k_`(jXU>_(zzOO!````` `````` ```` ` ````````
+`` ````` `` ````` `` `` `` ``` ?XO+. _?TH&JC(dHC(dE1wwOrvOo(jm._?C1-_?Ow+-_?7Ci(-_??TWM$~z<---.--.(N>(ko-.(J+uwZOT7<~_-(<?<~_.Jzv7~-(+<~-_____::::-(WHqBC?THHR+JX9>_(+OtOv`````````` ```` `````` `` `` `
+````` `````` `` `` ````` ````    ?wo- ` (7Ne-_-d9>(dMH0OIrI-?T\___-_?Ci-_?7TAJ--~?771+((--(-_(zzz<.7!_77<<!__-((-(?<<!~-(Jxv7<_((?<!_-jdkz(::(<+jwWk.?^_(z_?WHHY!-_+t1OC!  ```` `` `` ```` ` ```````` ``
+` `` `` `` `````````` ````` ``````.?wy- _._?SA+_(dHMM$((-_TMm_(zz-.._`._?71-._?7TTw&J--_~<?7777TTT7?77?7777<<~_..(JJzv77!_((J?<!_-__.-.!-(&++z2?WHHY7<.?^_(dV=~_(+zlz<~````````` ````` `````` `` `` ````
+````````` ``` `` `` ``` ````````````.?Oz-.` _?ZXWHMMD<-?7C_(7<1ztOzlz--(qg..-?7<+(--__?77TTTOuaaa&&g&&&&&zzz7777<~_-((-<?<~-(-__-.(<;<-.dWHkkWHo_<_(+-~(JdY>__+=lOtI````````` ````` ``` ` ````` `````` `
+`` `` ```````` `` ```` `` `` ` ` ` ``  ~?1x- ._?zTMNo~?Uc(z<(e._<1OOOl+<?=~-. .   -~??<<<++++---((-----((((+(+<<<?!!_.--__?X91z<1<;+++uQXl?W9>~(1_~_(JdV=~_(+11zZ<```````` ```` `` ``````` `` ``` `` ```
+``` `` ` `` ```````` `````` ``` `` ``````_<1z+-_.__?Wme--<(dM#Rz<(d6jXWHm++tllz+--. (Nm<_....____(-________..(jgx_.-..-((_-.(+Az+zwwR<?WHHo__+v~_j&dUC!-(+zlzOI!```````` ``` ``````` ` ````` ````` `````
+`````````` `` `` `` ``` ``````````` ``` ``` _?Oz--.._<?WHmdMMMMC+d8(d$_dMHkmAwOzzlz_.<<<++-------vM8.......---(7!<?1OI?++1-(WH6?l_XHH8>?HHHo--(dXYC~__++=z=z<````` ``` `` ```` `` ````` `` ```` ````` ``
+` `` `` ``````` ```````` ` `` `` ``````````   _<?zo--.~_?7WMMMR_?7(dD(dMHHH#MMHY4WmgHNmxzz=1z??<-.--+z<1=?+?<_(AQmAzzI<<~<~_7WR-j><+-.__jHHHW0VC~_((+1lz<<~ `````````````` ````` `` ````` ```` `` `` ```
+``` ```` `` ````` `` ``````` ```` `` `` ```   ```-?COz(--_~_<?T9w&--_dHHHHHHHMK1dMME-__~?7WHQQfOQHMNVTOv717T7<<<!?WHNe+&w:~_(._!~O_<~..JdWY><<_(+l=zz<<~``````````` `` ```` ` `````` `` ```` ````````` `
+````` `````` ` ``` `` ` `````` `````` `` `  `````` ` ?<zI+(:~~~:<:?CXHHHH##HM#R-__<<<?77>(dMMMt_dHMNx...(J.._(AQQ>(HHK_-(-_:(Wk&.jwwwVY=~_-(++11zv<!``   ``  `` ` ``` `` ````` `` ```` ```` ``` `` `````
+` ```` `` ````` ```````` ` ```` `` ```````````````````` _?1wO+-_::~~<?zTHMMHMMK<_?<(1O&+-(-----____._(<(MMR_jXMMHI_XgHf<~_(++XHWVY=!_-((++==zzv!!``````` ```````````````` ```````` `````` ``````` `` ``
+`` ``````` `````` `` `````` ````` `` `` ``````` ``````````` ~?zOO&&+<<:::<<?7TTCz&+uo---(z--_~~:~~??!(<_?77~---..((dmqHkzVC<<!__(((+?1zzzZC<!```````````` ``` `` ` ` `` ``` ` `` ``` `` ```` `` ````` ``
+``` ` `` ``` ` `````` `` ``` ` ``````` `` ` `` `` `  ` ```````` `~?COOzz++(:(((__~__<<<??7CCVUUUXXZWfWSwwtrOX9VVTC<<<<<<:-(((<+1z=zzzC>~```````````` ``````` `` `````` ``````` `````` ```` ``` ``` `````
+``````` ``````` `` ```` ``````` `` ````````` `````````` ` `````````` `_<?1OOzzz++(;;;<:_______-_:~__:__(:____((-+<++?>+=1++zzzOz7<!` `````````````` `` ` `````````` ````` `` ```` `````` `````````` `` `
+` `` ````` `` ````` ````` ` ``````` ` `` `````` `` ```````````````````````  __?77zOuywzzz&++1+++<<>>>>>>>>?++++1+++zzOOI<<<!_` ````````` ``````` ```````` ` `` `` ``` `` `````` `` ` `` ``` ` `` ```````
+````` `` ``` ``` ```` `````` `` ``````` `` `` ````` ` `` ``` `` `` `````````  `````  _!???<<<177CCzz111111z<<<<<??!`````````````` ` ` ``` ` ` ``` `` ```````` ```````````` `` ``````` ```` ```` `` `` ``
+`` `````````````` ```` ` ````` `` `` ``````````` ````` ``` ``` ```` `````````````````  `````` ````` ` ````` ```````````````````````` `` `````` `````` ` `` ````` ` ` `` ``` ```` ``````` ``````````` ```
+``` `` `` ` `` ``` `````` `` ````` ``` `` `` `` `` `````` `````` ```` ` ` ````` ```````````````` ```````````````` `````````````` ````` ``` ````` `` ```` ``` `` ````` `` ````` `` ` `` ```` ` `` ````` `
+
+-->
+                                 
