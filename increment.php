@@ -1,8 +1,9 @@
 <?php
-$host = '';
-$dbname = '';
-$user = '';
-$password = '';
+$servername = "";
+$user = "";
+$password = "";
+$dbname = "";
+$host = ""; 
 
 try {
     $dbh = new PDO("mysql:host=$host;dbname=$dbname", $user, $password);
@@ -29,4 +30,5 @@ try {
 } catch (PDOException $e) {
     echo "データベースエラー: " . $e->getMessage();
 }
+
 ?>
