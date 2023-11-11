@@ -59,41 +59,54 @@
         });
 
         let cooldownActive = false;
+        function incrementCount() {
+    var xhr = new XMLHttpRequest();
+    var audio = new Audio('money.mp3');
+    xhr.open('POST', 'increment.php', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var count = xhr.responseText;
+                var formattedCount = parseInt(count).toLocaleString();
+                document.getElementById('countDisplay').textContent = '現在の募金数: ' + formattedCount + '円';
+            } else {
+                // 失敗メッセージを表示
+                alert('募金に失敗しました。もう一度お試しください。');
+            }
+            // ボタンのクールダウンを終了
+            resetCooldown();
+        }
+    };
+      // 事前に作成した Audio オブジェクトを再利用
+      audio.volume = 1.0; 
+      audio.play();
 
-                function incrementCount() {
-                    var xhr = new XMLHttpRequest();
-                    var audio = new Audio('money.mp3');
-                    xhr.open('POST', 'increment.php', true);
-                    xhr.onreadystatechange = function() {
-                      if (xhr.readyState === 4 && xhr.status === 200) {
-                        var count = xhr.responseText;
-                        var formattedCount = parseInt(count).toLocaleString(); // カンマを追加
-                        document.getElementById('countDisplay').textContent = '現在の募金数: ' + formattedCount + '円';
-                      }
-                    };
-                    xhr.send();
-                    audio.volume = 1.0; 
-                    audio.play();
-
-                    if (!cooldownActive) {
-        cooldownActive = true;
-        const button = document.getElementById("donateButton");
-        
-        // クールダウン中の背景色を適用
-        button.classList.add("cooldown");
-
-        // ボタンを無効化
-        button.disabled = true;
-
-        // 1秒後にクールダウンを終了し、背景色を元に戻す
-        setTimeout(function() {
-            cooldownActive = false;
-            button.classList.remove("cooldown");
-            button.disabled = false;
-        }, 1000); // 1秒間のクールダウン
+    if (!cooldownActive) {
+        startCooldown();
     }
+}
 
-                  }
+function startCooldown() {
+    cooldownActive = true;
+    const button = document.getElementById("donateButton");
+
+    // クールダウン中の背景色を適用
+    button.classList.add("cooldown");
+
+    // ボタンを無効化
+    button.disabled = true;
+
+    // クールダウン時間後にクールダウンを終了し、背景色を元に戻す
+    setTimeout(resetCooldown, 1000); // 1秒間のクールダウン
+}
+
+function resetCooldown() {
+    cooldownActive = false;
+    const button = document.getElementById("donateButton");
+    button.classList.remove("cooldown");
+    button.disabled = false;
+}
+
               </script>
               <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
@@ -121,6 +134,9 @@ function stopload(){
   $('#loader').delay(600).fadeOut(300);
 }
 </script>
+      </div>
+      <!--  <p><img style="transform: translateY(16%);" src="warning.webp"> 現在テスト中 <a href="test-details/">(詳細)</a></p> -->
+    </div>
 </div>
 </div>
 </body>
